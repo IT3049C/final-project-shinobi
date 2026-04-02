@@ -1,4 +1,6 @@
 # GameHub
+Apiwat Anachai
+Kymani Jarrett
 
 ## Checklist
 
