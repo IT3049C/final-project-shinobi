@@ -1,7 +1,8 @@
 import React from "react";
+import { WordleGame } from "./wordle/WordleGame";
 
 export function Wordle() {
-  return <div>Wordle</div>;
+  return <WordleGame />;
 }
 
 export default Wordle;
