@@ -5,12 +5,24 @@ import "../App.css";
 
 export function AppLayout() {
   return (
-    <main>
-      <header>
-        <h1>Welcome to the Games Lobby</h1>
-      </header>
-      <Navigation />
-      <Outlet />
-    </main>
+    <>
+      <main
+        style={{
+          paddingTop: "64px",
+          minHeight: "100vh",
+          background: "#0a0a0f",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <header className="">
+          <span className="text-lg font-semibold text-foreground">
+            <Navigation />
+          </span>
+        </header>
+        <Outlet />
+      </main>
+    </>
   );
 }
