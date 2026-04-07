@@ -5,6 +5,6 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "/final-project-shinobi/",
   plugins: [react()],
-  server: { port: 5173, open: false },
+  server: { port: 5173, open: true },
   preview: { port: 5173 },
 });
