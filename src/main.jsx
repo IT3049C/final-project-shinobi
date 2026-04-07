@@ -10,20 +10,25 @@ import { Trivia } from "./pages/Trivia";
 import { Wordle } from "./pages/Wordle";
 import AnotherGame from "./pages/AnotherGame";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <AppLayout />,
+      children: [
+        { path: "/", element: <HomePage /> },
+        { path: "/rps", element: <RockPaperScissors /> },
+        { path: "/tic-tac-toe", element: <TicTacToe /> },
+        { path: "/trivia", element: <Trivia /> },
+        { path: "/wordle", element: <Wordle /> },
+        { path: "/another-game", element: <AnotherGame /> },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <AppLayout />,
-    children: [
-      { path: "/", element: <HomePage /> },
-      { path: "/rps", element: <RockPaperScissors /> },
-      { path: "/tic-tac-toe", element: <TicTacToe /> },
-      { path: "/trivia", element: <Trivia /> },
-      { path: "/wordle", element: <Wordle /> },
-      { path: "/another-game", element: <AnotherGame /> },
-    ],
+    basename: import.meta.env.BASE_URL,
   },
-]);
+);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
