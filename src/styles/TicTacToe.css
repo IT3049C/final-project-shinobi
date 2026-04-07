@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&display=swap');
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  font-family: 'Rajdhani', sans-serif;
+  color: #e2e8f0;
+
+}
+
+.game-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+}
+
+.status {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #818cf8;
+  text-align: center;
+  min-height: 1.5rem;
+}
+
+.board-row {
+  display: flex;
+  gap: 8px;
+}
+
+.board-row + .board-row {
+  margin-top: 8px;
+}
+
+.square {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(129,140,248,0.08);
+  border: 1px solid rgba(129,140,248,0.25);
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s, border-color 0.2s;
+  color: #e2e8f0;
+}
+
+.square:hover {
+  background: rgba(129,140,248,0.15);
+  border-color: rgba(129,140,248,0.5);
+}
+
+.square[data-value="X"] {
+  color: #818cf8;
+}
+
+.square[data-value="O"] {
+  color: #f472b6;
+}
+
+.game-title {
+  font-family: 'Rajdhani', sans-serif;
+  color: #818cf8;
+  letter-spacing: 0.2em;
+  font-size: 1rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.game-info {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.game-info ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.game-info button {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(129,140,248,0.15);
+  border-radius: 6px;
+  color: #94a3b8;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.game-info button:hover {
+  background: rgba(129,140,248,0.08);
+  border-color: rgba(129,140,248,0.35);
+  color: #e2e8f0;
+}
