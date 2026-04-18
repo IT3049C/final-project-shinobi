@@ -1,21 +1,27 @@
 import React from "react";
 import { useState } from "react";
 import "../styles/TicTacToe.css";
-
+import { useNavigate } from "react-router-dom";
 
 export function TicTacToe() {
+  const navigate = useNavigate();
   return (
-    <div className="game">
-      <p className="game-title">Tic · Tac · Toe</p>
-      <Game />
+    <div className="ttt-wrapper">
+      <header className="ttt-header">
+        <h2 className="ttt-heading">Tic Tac Toe</h2>
+        <nav>
+          <a onClick={() => navigate("/")} className="nav-link">
+            ← Back to Lobby
+          </a>
+        </nav>
+      </header>
+      <div className="game">
+        <p className="game-title">Tic · Tac · Toe</p>
+        <Game />
+      </div>
     </div>
   );
 }
-
-
-
-
-
 
 function Square({ value, onSquareClick }) {
   return (
@@ -134,6 +140,5 @@ function calculateWinner(squares) {
 const handleBackToSettings = () => {
   console.log(`going back to the settings view`);
 };
-
 
 export default TicTacToe;

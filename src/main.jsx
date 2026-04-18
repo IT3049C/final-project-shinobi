@@ -4,7 +4,7 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AppLayout } from "./components/AppLayout";
 import { HomePage } from "./pages/HomePage";
-import { RockPaperScissors } from "./pages/RockPaperScissors";
+import { RPSGamePage } from "./pages/RockPaperScissors";
 import { TicTacToe } from "./pages/TicTacToe";
 import { Trivia } from "./pages/Trivia";
 import { Wordle } from "./pages/Wordle";
@@ -17,7 +17,7 @@ const router = createBrowserRouter(
       element: <AppLayout />,
       children: [
         { path: "/", element: <HomePage /> },
-        { path: "/rps", element: <RockPaperScissors /> },
+        { path: "/rps", element: <RPSGamePage /> },
         { path: "/tic-tac-toe", element: <TicTacToe /> },
         { path: "/trivia", element: <Trivia /> },
         { path: "/wordle", element: <Wordle /> },

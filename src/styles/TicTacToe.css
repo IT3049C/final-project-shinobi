@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&display=swap");
 
 .game {
   display: flex;
@@ -6,20 +6,18 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem 1rem;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   color: #e2e8f0;
-
 }
 
 .game-board {
   display: flex;
   flex-direction: column;
   align-items: center;
-
 }
 
 .status {
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -44,21 +42,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(129,140,248,0.08);
-  border: 1px solid rgba(129,140,248,0.25);
+  background: rgba(129, 140, 248, 0.08);
+  border: 1px solid rgba(129, 140, 248, 0.25);
   border-radius: 8px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
   font-size: 1.8rem;
   font-weight: 700;
   cursor: pointer;
   outline: none;
-  transition: background 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
   color: #e2e8f0;
 }
 
 .square:hover {
-  background: rgba(129,140,248,0.15);
-  border-color: rgba(129,140,248,0.5);
+  background: rgba(129, 140, 248, 0.15);
+  border-color: rgba(129, 140, 248, 0.5);
 }
 
 .square[data-value="X"] {
@@ -70,7 +70,7 @@
 }
 
 .game-title {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   color: #818cf8;
   letter-spacing: 0.2em;
   font-size: 1rem;
@@ -97,22 +97,77 @@
 }
 
 .game-info button {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(129,140,248,0.15);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(129, 140, 248, 0.15);
   border-radius: 6px;
   color: #94a3b8;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   padding: 0.45rem 0.85rem;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .game-info button:hover {
-  background: rgba(129,140,248,0.08);
-  border-color: rgba(129,140,248,0.35);
+  background: rgba(129, 140, 248, 0.08);
+  border-color: rgba(129, 140, 248, 0.35);
   color: #e2e8f0;
+}
+
+.ttt-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem;
+  box-sizing: border-box;
+  font-family: "Rajdhani", sans-serif;
+  color: #e2e8f0;
+}
+
+.ttt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid rgba(129, 140, 248, 0.2);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ttt-heading {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin: 0;
+  background: linear-gradient(135deg, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.4));
+}
+
+.ttt-header .nav-link {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #475569;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.ttt-header .nav-link:hover {
+  color: #818cf8;
 }
