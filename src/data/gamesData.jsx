@@ -255,7 +255,7 @@ export const games = [
   {
     key: "another-game",
     path: "/another-game",
-    name: "Picture Trivia",
+    name: "Pokemon",
     description: "Reveal the image. Guess what's hiding.",
     emoji: "🖼️",
     color: "#c084fc",

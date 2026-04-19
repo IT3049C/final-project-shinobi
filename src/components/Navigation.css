@@ -17,7 +17,6 @@
   box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
 }
 
-/* Subtle scanline texture */
 .navbar::before {
   content: "";
   position: absolute;
@@ -30,6 +29,12 @@
     rgba(255, 255, 255, 0.015) 4px
   );
   pointer-events: none;
+}
+
+.navbar-brand,
+.navbar-links {
+  position: relative;
+  z-index: 1;
 }
 
 .navbar-brand {
@@ -48,6 +53,9 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.5));
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease;
 }
 
 .navbar-links {
@@ -60,6 +68,9 @@
 }
 
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: "Rajdhani", sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
@@ -76,6 +87,20 @@
     border-color 0.2s ease,
     background 0.2s ease;
   white-space: nowrap;
+}
+
+.nav-button {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  margin: 0;
+  cursor: pointer;
+}
+
+.nav-button::-moz-focus-inner {
+  border: 0;
 }
 
 .nav-link:hover {
@@ -107,13 +132,6 @@
 .brand-link {
   text-decoration: none;
   cursor: pointer;
-}
-
-.game-hub-title {
-  /* add to existing styles */
-  transition:
-    filter 0.2s ease,
-    transform 0.2s ease;
 }
 
 .brand-link:hover .game-hub-title {

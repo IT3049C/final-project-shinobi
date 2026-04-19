@@ -1,7 +1,19 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Navigation.css";
 
 export function Navigation() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { to: "/", label: "Home" },
+    { to: "/trivia", label: "Trivia" },
+    { to: "/rps", label: "Rock Paper Scissors" },
+    { to: "/tic-tac-toe", label: "Tic Tac Toe" },
+    { to: "/wordle", label: "Wordle" },
+    { to: "/another-game", label: "Pokemon" },
+  ];
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -10,66 +22,24 @@ export function Navigation() {
         </NavLink>
       </div>
       <ul className="navbar-links">
-        <li>
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Home
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/trivia"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Trivia
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/rps"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Rock Paper Scissors
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/tic-tac-toe"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Tic Tac Toe
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/wordle"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Wordle
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/another-game"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Another Game
-          </NavLink>
-        </li>
+        {navItems.map((item) => {
+          const isActive =
+            item.to === "/"
+              ? location.pathname === "/"
+              : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+
+          return (
+            <li key={item.to}>
+              <button
+                className={isActive ? "nav-link active nav-button" : "nav-link nav-button"}
+                onClick={() => navigate(item.to)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
