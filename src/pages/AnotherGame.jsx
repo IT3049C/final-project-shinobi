@@ -1,293 +1,184 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  createGameState,
-  revealTile,
-  makeGuess,
-  startNextRound,
-  fetchRandomPokemon,
-} from "../logic/pokemonGame";
+import { LobbyScreen } from "../components/pokemon-game/LobbyScreen";
+import { WaitingRoom } from "../components/pokemon-game/WaitingRoom";
+import { GameHeader } from "../components/pokemon-game/GameHeader";
+import { ScoreBar } from "../components/pokemon-game/ScoreBar";
+import { TileBoard } from "../components/pokemon-game/TileBoard";
+import { ActionPanel } from "../components/pokemon-game/ActionPanel";
+import { RoundResult } from "../components/pokemon-game/RoundResult";
+import { useRoomPolling } from "../hooks/useRoomPolling";
+import { useGameActions } from "../hooks/useGameActions";
+import { createGameState, fetchRandomPokemon } from "../logic/pokemonGame";
+import { getPlayerId } from "../logic/gameRoomApi";
 import "../styles/PokemonGame.css";
 
 export default function AnotherGame() {
   const navigate = useNavigate();
-  const playerNames = ["Player 1", "Player 2"];
-  const [game, setGame] = useState(() => createGameState(playerNames));
+  const playerId = getPlayerId();
+
+  const [screen, setScreen] = useState("lobby");
+  const [mode, setMode] = useState(null);
+  const [roomId, setRoomId] = useState(null);
+  const [game, setGame] = useState(null);
   const [pokemon, setPokemon] = useState(null);
   const [loadingPokemon, setLoadingPokemon] = useState(false);
   const [guess, setGuess] = useState("");
   const [actionMode, setActionMode] = useState(null);
 
-  const loadPokemon = async () => {
-    setLoadingPokemon(true);
+  const resetToLobby = () => {
+    setScreen("lobby");
+    setGame(null);
+    setPokemon(null);
+    setRoomId(null);
+    setMode(null);
+    setActionMode(null);
+    setGuess("");
+  };
+
+  useRoomPolling({
+    roomId,
+    enabled: mode === "online" && screen === "game",
+    onUpdate: (gameState) => {
+      setGame(gameState);
+      if (gameState.pokemon) setPokemon(gameState.pokemon);
+    },
+    onAbandoned: () => {
+      alert("The game has ended — not enough players remaining.");
+      resetToLobby();
+    },
+  });
+
+  const { handleReveal, handleGuessSubmit, handleNextRound } = useGameActions({
+    game,
+    pokemon,
+    mode,
+    roomId,
+    setGame,
+    setPokemon,
+    setLoadingPokemon,
+    setActionMode,
+    setGuess,
+  });
+
+  const handleJoinRoom = (rId, gameState, playerIndex) => {
+    setRoomId(rId);
+    setGame(gameState);
+    if (gameState.pokemon) setPokemon(gameState.pokemon);
+    setMode("online");
+    setScreen("waiting");
+  };
+
+  const handleLocalPlay = async () => {
+    setMode("local");
     const p = await fetchRandomPokemon();
     setPokemon(p);
-    console.log(`Pokemon: ${p.name}`);
-    setLoadingPokemon(false);
+    console.log(`🎮 Pokemon: ${p.name} (ID: ${p.id})`);
+    setGame(
+      createGameState(["Player 1", "Player 2"], {
+        tileCount: 25,
+        maxPlayers: 2,
+      }),
+    );
+    setScreen("game");
   };
 
-  useEffect(() => {
-    loadPokemon();
-  }, []);
-
-  const handleReveal = (i) => {
-    if (game.phase !== "playing") return;
-    if (game.tiles[i]) return;
-    if (game.players[game.currentPlayerIndex].eliminated) return;
-    if (actionMode !== "reveal") return;
-    if (allTilesRevealed) return;
-    setGame((prev) => revealTile(prev, i));
-    setActionMode(null);
+  const handleGameStart = (gameState) => {
+    setGame(gameState);
+    if (gameState.pokemon) setPokemon(gameState.pokemon);
+    setScreen("game");
   };
 
-  const allTilesRevealed = game.tiles.every(Boolean);
+  const isMyTurn =
+    mode === "local"
+      ? true
+      : game?.players[game.currentPlayerIndex]?.id === playerId;
+  const currentPlayer = game?.players[game?.currentPlayerIndex];
+  const allTilesRevealed = game?.tiles.every(Boolean);
+  const isRoundOver = game?.phase === "roundOver" || game?.phase === "gameOver";
 
-  const handleGuessSubmit = () => {
-    if (!guess.trim() || !pokemon) return;
-    setGame((prev) => makeGuess(prev, guess, pokemon.name, allTilesRevealed));
-    setGuess("");
-    if (!allTilesRevealed) setActionMode(null);
-  };
+  if (screen === "lobby") {
+    return (
+      <div className="pg-wrapper">
+        <GameHeader mode={null} onBackToLobby={() => navigate("/")} />
+        <LobbyScreen
+          onJoinRoom={handleJoinRoom}
+          onLocalPlay={handleLocalPlay}
+        />
+      </div>
+    );
+  }
 
-  const handleNextRound = () => {
-    setActionMode(null);
-    setGame((prev) => startNextRound(prev));
-    loadPokemon();
-  };
+  if (screen === "waiting") {
+    return (
+      <div className="pg-wrapper">
+        <GameHeader
+          mode="online"
+          roomId={roomId}
+          game={game}
+          onBackToLobby={resetToLobby}
+        />
+        <WaitingRoom
+          roomId={roomId}
+          onGameStart={handleGameStart}
+          onBackToLobby={resetToLobby}
+        />
+      </div>
+    );
+  }
 
-  const handlePlayAgain = () => {
-    setGame(createGameState(playerNames));
-    setActionMode(null);
-    loadPokemon();
-  };
-
-  const currentPlayer = game.players[game.currentPlayerIndex];
-  const isRoundOver = game.phase === "roundOver" || game.phase === "gameOver";
+  if (!game) return null;
 
   return (
     <div className="pg-wrapper">
-      <header className="pg-header">
-        <h2 className="pg-heading">Who's That Pokémon?</h2>
-        <nav>
-          <a onClick={() => navigate("/")} className="nav-link">
-            ← Back to Lobby
-          </a>
-        </nav>
-      </header>
+      <GameHeader
+        mode={mode}
+        roomId={roomId}
+        game={game}
+        onBackToLobby={resetToLobby}
+      />
 
-      <div className="pg-scorebar">
-        <div className="pg-round">
-          Round {game.round} / {game.maxRounds}
+      {mode === "online" && roomId && (
+        <div className="pg-room-badge">
+          Room: <span>{roomId}</span>
         </div>
-        <div className="pg-scores">
-          {game.players.map((p, i) => (
-            <div
-              key={i}
-              className={`pg-score-card ${i === game.currentPlayerIndex && !isRoundOver ? "pg-score-active" : ""}`}
-            >
-              <span className="pg-score-name">{p.name}</span>
-              <span className="pg-score-value">{p.score}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
+
+      <ScoreBar game={game} isRoundOver={isRoundOver} />
 
       <div className="pg-board">
-        <div className="pg-image-wrapper">
-          {loadingPokemon ? (
-            <div className="pg-loading">Loading...</div>
-          ) : (
-            <>
-              {pokemon && (
-                <img
-                  src={pokemon.image}
-                  alt="hidden pokemon"
-                  className="pg-pokemon-img"
-                  draggable={false}
-                />
-              )}
-              <div className="pg-tile-grid">
-                {game.tiles.map((revealed, i) => (
-                  <div
-                    key={i}
-                    className={`pg-tile ${revealed && !isRoundOver ? "pg-tile-revealed" : ""} ${!revealed && actionMode === "reveal" ? "pg-tile-clickable" : ""}`}
-                    onClick={() => handleReveal(i)}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        <TileBoard
+          pokemon={pokemon}
+          tiles={game.tiles}
+          tileCount={game.tileCount}
+          isRoundOver={isRoundOver}
+          actionMode={actionMode}
+          isMyTurn={isMyTurn}
+          loadingPokemon={loadingPokemon}
+          onReveal={(i) => handleReveal(i, { playerId, actionMode })}
+        />
 
         {!isRoundOver ? (
-          <div className="pg-action-panel">
-            <div className="pg-turn-indicator">
-              <span className="pg-turn-label">Your turn</span>
-              <span className="pg-turn-name">{currentPlayer.name}</span>
-              {currentPlayer.eliminated && (
-                <span className="pg-eliminated">Eliminated this round</span>
-              )}
-            </div>
-
-            {!currentPlayer.eliminated && (
-              <>
-                {allTilesRevealed ? (
-                  <div className="pg-guess-form">
-                    <p className="pg-prompt-text">
-                      All tiles revealed —{" "}
-                      {
-                        game.players.filter(
-                          (_, i) => !game.guessedPlayers.includes(i),
-                        ).length
-                      }{" "}
-                      guess(es) remaining
-                    </p>
-                    <input
-                      className="pg-guess-input"
-                      type="text"
-                      placeholder="Enter Pokémon name..."
-                      value={guess}
-                      onChange={(e) => setGuess(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && handleGuessSubmit()
-                      }
-                      autoFocus
-                    />
-                    <button
-                      className="pg-btn pg-btn-guess"
-                      onClick={handleGuessSubmit}
-                    >
-                      Submit Guess
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {actionMode === null && (
-                      <div className="pg-action-buttons">
-                        <button
-                          className="pg-btn pg-btn-reveal"
-                          onClick={() => setActionMode("reveal")}
-                        >
-                          🔲 Reveal a Tile
-                        </button>
-                        <button
-                          className="pg-btn pg-btn-guess"
-                          onClick={() => setActionMode("guess")}
-                        >
-                          💡 Make a Guess
-                        </button>
-                      </div>
-                    )}
-
-                    {actionMode === "reveal" && (
-                      <div className="pg-action-prompt">
-                        <p className="pg-prompt-text">
-                          Click any hidden tile to reveal it
-                        </p>
-                        <button
-                          className="pg-btn-cancel"
-                          onClick={() => setActionMode(null)}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
-
-                    {actionMode === "guess" && (
-                      <div className="pg-guess-form">
-                        <input
-                          className="pg-guess-input"
-                          type="text"
-                          placeholder="Enter Pokémon name..."
-                          value={guess}
-                          onChange={(e) => setGuess(e.target.value)}
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && handleGuessSubmit()
-                          }
-                          autoFocus
-                        />
-                        <div className="pg-guess-actions">
-                          <button
-                            className="pg-btn pg-btn-guess"
-                            onClick={handleGuessSubmit}
-                          >
-                            Submit
-                          </button>
-                          <button
-                            className="pg-btn-cancel"
-                            onClick={() => setActionMode(null)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-
-            {game.lastAction === "wrongGuess" && (
-              <p className="pg-wrong-guess">Wrong guess! Turn passes.</p>
-            )}
-          </div>
+          <ActionPanel
+            currentPlayer={currentPlayer}
+            isMyTurn={isMyTurn}
+            allTilesRevealed={allTilesRevealed}
+            actionMode={actionMode}
+            setActionMode={setActionMode}
+            guess={guess}
+            setGuess={setGuess}
+            onGuessSubmit={() => handleGuessSubmit(guess)}
+            game={game}
+          />
         ) : (
-          <div className="pg-round-result">
-            {game.roundWinner !== null ? (
-              <>
-                <p className="pg-result-winner">
-                  🏆 {game.players[game.roundWinner].name} guessed it!
-                </p>
-                <p className="pg-result-pokemon">
-                  It was <span>{pokemon?.name}</span>!
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="pg-result-winner">Nobody guessed it!</p>
-                <p className="pg-result-pokemon">
-                  It was <span>{pokemon?.name}</span>!
-                </p>
-              </>
-            )}
-
-            {game.phase === "roundOver" ? (
-              <button
-                className="pg-btn pg-btn-reveal"
-                onClick={handleNextRound}
-              >
-                Next Round →
-              </button>
-            ) : (
-              <div className="pg-game-over">
-                <p className="pg-game-over-title">Game Over!</p>
-                {(() => {
-                  const top = [...game.players].sort(
-                    (a, b) => b.score - a.score,
-                  );
-                  return (
-                    <p className="pg-result-winner">
-                      🥇 {top[0].name} wins with {top[0].score} pts!
-                    </p>
-                  );
-                })()}
-                <div className="pg-game-over-btns">
-                  <button
-                    className="pg-btn pg-btn-guess"
-                    onClick={handlePlayAgain}
-                  >
-                    Play Again
-                  </button>
-                  <button
-                    className="pg-btn-cancel"
-                    onClick={() => navigate("/")}
-                  >
-                    Back to Lobby
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          <RoundResult
+            game={game}
+            pokemon={pokemon}
+            isMyTurn={isMyTurn}
+            mode={mode}
+            onNextRound={handleNextRound}
+            onBackToLobby={resetToLobby}
+          />
         )}
       </div>
     </div>

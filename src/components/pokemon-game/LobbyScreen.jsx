@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import {
   createRoom,
   listRooms,
+  getRoom,
+  updateRoom,
   getPlayerId,
   getPlayerName,
 } from "../../logic/gameRoomApi";
 import { fetchRandomPokemon } from "../../logic/pokemonGame";
 
 const POLL_INTERVAL = 3000;
+const TILE_OPTIONS = [25, 36, 49, 64, 81];
+const PLAYER_OPTIONS = [2, 3, 4];
 
 export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
   const [rooms, setRooms] = useState([]);
@@ -17,20 +21,22 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
   const [joining, setJoining] = useState(null);
   const [error, setError] = useState(null);
   const [manualCode, setManualCode] = useState("");
+  const [maxPlayers, setMaxPlayers] = useState(2);
+  const [maxRounds, setMaxRounds] = useState(3);
+  const [tileCount, setTileCount] = useState(25);
 
   const playerName = getPlayerName();
   const playerId = getPlayerId();
 
   useEffect(() => {
-    let interval;
-
     const fetchRooms = async () => {
       try {
         const data = await listRooms();
         const open = data.filter(
           (r) =>
             r.gameState?.phase === "waiting" &&
-            (r.gameState?.players?.length ?? 0) < 2,
+            (r.gameState?.players?.length ?? 0) <
+              (r.gameState?.maxPlayers ?? 2),
         );
         setRooms(open);
       } catch {
@@ -40,7 +46,7 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
     };
 
     fetchRooms();
-    interval = setInterval(fetchRooms, POLL_INTERVAL);
+    const interval = setInterval(fetchRooms, POLL_INTERVAL);
     return () => clearInterval(interval);
   }, []);
 
@@ -52,12 +58,22 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
       const pokemon = await fetchRandomPokemon();
       const initialState = {
         roomName: roomName.trim(),
-        players: [{ id: playerId, name: playerName, ready: true }],
+        players: [
+          {
+            id: playerId,
+            name: playerName,
+            score: 0,
+            left: false,
+            eliminated: false,
+          },
+        ],
         currentPlayerIndex: 0,
-        tiles: Array(25).fill(false),
+        tiles: Array(tileCount).fill(false),
+        tileCount,
+        maxPlayers,
+        maxRounds,
         phase: "waiting",
         round: 1,
-        maxRounds: 3,
         roundWinner: null,
         lastAction: null,
         guessedPlayers: [],
@@ -66,7 +82,7 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
       };
       const { roomId, gameState } = await createRoom(initialState);
       onJoinRoom(roomId, gameState, 0);
-    } catch (e) {
+    } catch {
       setError("Failed to create room. Try again.");
     } finally {
       setCreating(false);
@@ -77,22 +93,38 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
     setJoining(roomId);
     setError(null);
     try {
-      const { gameState } = await import("../../logic/gameRoomApi").then(() =>
-        import("../../logic/gameRoomApi").then((m) => m.getRoom(roomId)),
-      );
+      const { gameState } = await getRoom(roomId);
+
+      if (gameState.players.length >= (gameState.maxPlayers ?? 2)) {
+        setError("Room is full.");
+        return;
+      }
+
+      if (gameState.players.some((p) => p.id === playerId)) {
+        setError("You're already in this room.");
+        return;
+      }
+
+      const updatedPlayers = [
+        ...gameState.players,
+        {
+          id: playerId,
+          name: playerName,
+          score: 0,
+          left: false,
+          eliminated: false,
+        },
+      ];
 
       const updatedState = {
         ...gameState,
-        players: [
-          ...gameState.players,
-          { id: playerId, name: playerName, ready: true },
-        ],
-        phase: "playing",
+        players: updatedPlayers,
+        phase: "waiting",
         version: (gameState.version ?? 0) + 1,
       };
-      const { updateRoom } = await import("../../logic/gameRoomApi");
+
       await updateRoom(roomId, updatedState);
-      onJoinRoom(roomId, updatedState, 1);
+      onJoinRoom(roomId, updatedState, updatedPlayers.length - 1);
     } catch {
       setError("Failed to join room. It may be full or gone.");
     } finally {
@@ -120,11 +152,56 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
             <input
               className="lobby-input"
               type="text"
-              placeholder="e.g. Kymani's Room"
+              placeholder="Enter Room Name" // ← updated
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreateRoom()}
             />
+          </div>
+
+          <div className="lobby-field">
+            <label className="lobby-label">Number of Rounds</label>
+            <div className="lobby-option-row">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  className={`lobby-option-btn ${maxRounds === n ? "active" : ""}`}
+                  onClick={() => setMaxRounds(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="lobby-field">
+            <label className="lobby-label">Max Players</label>
+            <div className="lobby-option-row">
+              {PLAYER_OPTIONS.map((n) => (
+                <button
+                  key={n}
+                  className={`lobby-option-btn ${maxPlayers === n ? "active" : ""}`}
+                  onClick={() => setMaxPlayers(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="lobby-field">
+            <label className="lobby-label">Difficulty (Tile Count)</label>
+            <div className="lobby-option-row">
+              {TILE_OPTIONS.map((n) => (
+                <button
+                  key={n}
+                  className={`lobby-option-btn ${tileCount === n ? "active" : ""}`}
+                  onClick={() => setTileCount(n)}
+                >
+                  {Math.sqrt(n)}×{Math.sqrt(n)}
+                </button>
+              ))}
+            </div>
           </div>
 
           <button
@@ -182,7 +259,8 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
                       {room.gameState?.roomName || room.id}
                     </span>
                     <span className="lobby-room-meta">
-                      {room.gameState?.players?.length ?? 0}/2 players ·{" "}
+                      {room.gameState?.players?.length ?? 0}/
+                      {room.gameState?.maxPlayers ?? 2} players ·{" "}
                       <span className="lobby-room-code">{room.id}</span>
                     </span>
                   </div>

@@ -33,17 +33,24 @@ export async function listRooms() {
 }
 
 export async function safePush(roomId, localGameState) {
-  const latest = await getRoom(roomId);
-  const serverVersion = latest.gameState?.version ?? 0;
-  const localVersion = localGameState?.version ?? 0;
-
-  if (serverVersion !== localVersion) {
-    return latest.gameState;
+  try {
+    const latest = await getRoom(roomId);
+    const serverVersion = latest.gameState?.version ?? 0;
+    const next = { ...localGameState, version: serverVersion + 1 };
+    const updated = await updateRoom(roomId, next);
+    return updated.gameState;
+  } catch {
+    return localGameState;
   }
+}
 
-  const next = { ...localGameState, version: localVersion + 1 };
-  const updated = await updateRoom(roomId, next);
-  return updated.gameState;
+export async function abandonRoom(roomId, gameState) {
+  const next = {
+    ...gameState,
+    phase: "abandoned",
+    version: (gameState.version ?? 0) + 1,
+  };
+  await updateRoom(roomId, next);
 }
 
 export function getPlayerId() {

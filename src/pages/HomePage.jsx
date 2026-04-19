@@ -9,7 +9,10 @@ export function HomePage() {
   const [hoveredGame, setHoveredGame] = useState(games[0]);
 
   const handleEnter = () => {
-    if (inputName.trim()) setPlayerName(inputName.trim());
+    if (inputName.trim()) {
+      setPlayerName(inputName.trim());
+      localStorage.setItem("playerName", inputName.trim()); // ← add this
+    }
   };
 
   const renderPreview = () => {
