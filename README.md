@@ -1,5 +1,6 @@
 # GameHub
 Group Members:
+Group Members:
 Apiwat Anachai
 Kymani Jarrett
 
@@ -7,11 +8,14 @@ Kymani Jarrett
 
 - [x] frequent commits to github.
 - [x] filled out the self-evaluation.
+- [x] frequent commits to github.
+- [x] filled out the self-evaluation.
 
 ## Self Grading Guide
 <!--- Update the following line with your self-grade --->
 <!--- Check the Rubric on Canvas for a guideline --->
 
+I should get **(20)** out of 20 on this assignment.
 I should get **(20)** out of 20 on this assignment.
 
 ## Self-Reflection
