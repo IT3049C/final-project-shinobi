@@ -28,20 +28,6 @@
   letter-spacing: 0.03em;
 }
 
-.wordle-status-strip {
-  min-height: 2.4rem;
-  margin: 0 auto 1rem;
-  width: min(560px, 100%);
-  padding: 0.55rem 0.8rem;
-  text-align: center;
-  color: #f8fafc;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 8px;
-  font-family: "Rajdhani", sans-serif;
-  font-weight: 600;
-}
-
 .wordle-board {
   display: grid;
   gap: 0.45rem;
@@ -69,6 +55,7 @@
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
+  animation-fill-mode: both;
 }
 
 .wordle-tile-filled {
@@ -88,6 +75,10 @@
 .wordle-tile-absent {
   background: rgba(71, 85, 105, 0.55);
   border-color: #64748b;
+}
+
+.wordle-win-tile {
+  box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.25), 0 0 18px rgba(74, 222, 128, 0.25);
 }
 
 .wordle-keyboard {

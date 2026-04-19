@@ -19,7 +19,9 @@ export function WordleBoard({
   currentRow,
   evaluations,
   guesses,
+  invalidAttemptCount,
   maxGuesses,
+  status,
   wordLength,
 }) {
   return (
@@ -34,17 +36,44 @@ export function WordleBoard({
           letters = currentGuess.split("");
         }
 
+        const rowClasses = ["wordle-row"];
+        const rowKey = isActiveRow
+          ? `row-${rowIndex}-attempt-${invalidAttemptCount}`
+          : `row-${rowIndex}`;
+
+        if (isActiveRow && invalidAttemptCount > 0) {
+          rowClasses.push("animate__animated", "animate__headShake");
+        }
+
         return (
-          <div className="wordle-row" key={`row-${rowIndex}`}>
+          <div className={rowClasses.join(" ")} key={rowKey}>
             {Array.from({ length: wordLength }, (_, columnIndex) => {
               const letter = letters[columnIndex] || "";
               const state = rowStates[columnIndex] || null;
               const hasLetter = letter.length > 0;
+              const shouldFlip = Boolean(submittedGuess && state);
+
+              const tileClasses = [getTileClassName(state, hasLetter)];
+              if (shouldFlip) {
+                tileClasses.push("animate__animated", "animate__flipInX");
+              }
+
+              if (status === "won" && rowIndex === currentRow && shouldFlip) {
+                tileClasses.push("wordle-win-tile");
+              }
 
               return (
                 <div
-                  className={getTileClassName(state, hasLetter)}
+                  className={tileClasses.join(" ")}
                   key={`tile-${rowIndex}-${columnIndex}`}
+                  style={
+                    shouldFlip
+                      ? {
+                          animationDuration: "0.5s",
+                          animationDelay: `${columnIndex * 0.12}s`,
+                        }
+                      : undefined
+                  }
                 >
                   {letter}
                 </div>

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   MAX_GUESSES,
-  VALID_WORDS,
   WORD_LENGTH,
+  isValidGuessWord,
   pickRandomAnswer,
 } from "../data/words";
 import { evaluateGuess } from "../utils/evaluateGuess";
@@ -45,13 +45,14 @@ function mergeLetterStates(previousStates, guess, evaluation) {
 }
 
 export function useWordleGame() {
-  const [answer, setAnswer] = useState(() => pickRandomAnswer());
+  const [answer, setAnswer] = useState("");
   const [guesses, setGuesses] = useState(emptyRows);
   const [evaluations, setEvaluations] = useState(emptyEvaluations);
   const [currentRow, setCurrentRow] = useState(0);
   const [currentGuess, setCurrentGuess] = useState("");
-  const [status, setStatus] = useState("playing");
-  const [notice, setNotice] = useState("");
+  const [status, setStatus] = useState("loading");
+  const [isCheckingGuess, setIsCheckingGuess] = useState(false);
+  const [invalidAttemptCount, setInvalidAttemptCount] = useState(0);
   const [letterStates, setLetterStates] = useState({});
   const [stats, setStats] = useState(DEFAULT_STATS);
 
@@ -59,17 +60,24 @@ export function useWordleGame() {
     setStats(loadStats());
   }, []);
 
-  useEffect(() => {
-    if (!notice) {
-      return undefined;
+  const setupNewAnswer = async () => {
+    setStatus("loading");
+    setIsCheckingGuess(false);
+    setInvalidAttemptCount(0);
+
+    try {
+      const nextAnswer = await pickRandomAnswer();
+      setAnswer(nextAnswer);
+      setStatus("playing");
+    } catch {
+      setStatus("playing");
+      setAnswer("CRANE");
     }
+  };
 
-    const timeoutId = window.setTimeout(() => {
-      setNotice("");
-    }, 1500);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [notice]);
+  useEffect(() => {
+    setupNewAnswer();
+  }, []);
 
   const gameResult = useMemo(() => {
     if (status === "won") {
@@ -80,18 +88,37 @@ export function useWordleGame() {
       return `Out of tries. The word was ${answer}.`;
     }
 
+    if (status === "loading") {
+      return "Loading a new word...";
+    }
+
     return "";
   }, [answer, status]);
 
-  const acceptGuess = () => {
+  const acceptGuess = async () => {
+    if (isCheckingGuess || status !== "playing") {
+      return;
+    }
+
     if (currentGuess.length < WORD_LENGTH) {
-      setNotice(`Word must be ${WORD_LENGTH} letters`);
+      setInvalidAttemptCount((count) => count + 1);
       return;
     }
 
     const normalizedGuess = currentGuess.toUpperCase();
-    if (!VALID_WORDS.has(normalizedGuess.toLowerCase())) {
-      setNotice("Word not in list");
+    setIsCheckingGuess(true);
+
+    let isValidWord = false;
+    try {
+      isValidWord = await isValidGuessWord(normalizedGuess);
+    } catch {
+      isValidWord = false;
+    }
+
+    setIsCheckingGuess(false);
+
+    if (!isValidWord) {
+      setInvalidAttemptCount((count) => count + 1);
       return;
     }
 
@@ -140,7 +167,7 @@ export function useWordleGame() {
   };
 
   const handleKeyInput = (key) => {
-    if (status !== "playing") {
+    if (status !== "playing" || isCheckingGuess) {
       return;
     }
 
@@ -167,14 +194,15 @@ export function useWordleGame() {
   };
 
   const startNewGame = () => {
-    setAnswer(pickRandomAnswer());
     setGuesses(emptyRows());
     setEvaluations(emptyEvaluations());
     setCurrentRow(0);
     setCurrentGuess("");
-    setStatus("playing");
-    setNotice("");
+    setStatus("loading");
+    setIsCheckingGuess(false);
+    setInvalidAttemptCount(0);
     setLetterStates({});
+    setupNewAnswer();
   };
 
   return {
@@ -185,9 +213,10 @@ export function useWordleGame() {
     gameResult,
     guesses,
     handleKeyInput,
+    invalidAttemptCount,
+    isCheckingGuess,
     letterStates,
     maxGuesses: MAX_GUESSES,
-    notice,
     startNewGame,
     status,
     stats,

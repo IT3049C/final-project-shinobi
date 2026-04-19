@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import "animate.css";
 import { WordleBoard } from "./components/WordleBoard";
 import { WordleKeyboard } from "./components/WordleKeyboard";
 import { useWordleGame } from "./hooks/useWordleGame";
@@ -40,9 +41,10 @@ export function WordleGame() {
     gameResult,
     guesses,
     handleKeyInput,
+    invalidAttemptCount,
+    isCheckingGuess,
     letterStates,
     maxGuesses,
-    notice,
     startNewGame,
     status,
     stats,
@@ -73,21 +75,19 @@ export function WordleGame() {
         <p>Guess the hidden {wordLength}-letter word in {maxGuesses} tries.</p>
       </header>
 
-      <div className="wordle-status-strip" aria-live="polite">
-        {notice || gameResult || "Type your guess using keyboard or buttons below."}
-      </div>
-
       <WordleBoard
         currentGuess={currentGuess}
         currentRow={currentRow}
         evaluations={evaluations}
         guesses={guesses}
+        invalidAttemptCount={invalidAttemptCount}
         maxGuesses={maxGuesses}
+        status={status}
         wordLength={wordLength}
       />
 
       <WordleKeyboard
-        disabled={status !== "playing"}
+        disabled={status !== "playing" || isCheckingGuess}
         letterStates={letterStates}
         onKeyPress={handleKeyInput}
       />
@@ -96,8 +96,12 @@ export function WordleGame() {
         <button className="wordle-new-game" onClick={startNewGame} type="button">
           New Game
         </button>
-        {status !== "playing" ? (
+        {status === "loading" ? <p className="wordle-answer">Loading word...</p> : null}
+        {status === "won" || status === "lost" ? (
           <p className="wordle-answer">Answer: {answer}</p>
+        ) : null}
+        {status === "won" || status === "lost" ? (
+          <p className="wordle-answer">{gameResult}</p>
         ) : null}
       </div>
 
