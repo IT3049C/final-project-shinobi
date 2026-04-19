@@ -1,7 +1,2 @@
-import React from "react";
-
-export function Trivia() {
-  return <div>Trivia</div>;
-}
-
-export default Trivia;
+export { TriviaGame as Trivia } from "./trivia/TriviaGame";
+export { default } from "./trivia/TriviaGame";
