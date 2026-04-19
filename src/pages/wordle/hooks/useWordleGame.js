@@ -28,6 +28,16 @@ function emptyEvaluations() {
   return Array.from({ length: MAX_GUESSES }, () => null);
 }
 
+function emptyRevealStates() {
+  return Array.from({ length: MAX_GUESSES }, () => 0);
+}
+
+function sleep(duration) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, duration);
+  });
+}
+
 function mergeLetterStates(previousStates, guess, evaluation) {
   const nextStates = { ...previousStates };
 
@@ -48,10 +58,12 @@ export function useWordleGame() {
   const [answer, setAnswer] = useState("");
   const [guesses, setGuesses] = useState(emptyRows);
   const [evaluations, setEvaluations] = useState(emptyEvaluations);
+  const [revealCounts, setRevealCounts] = useState(emptyRevealStates);
   const [currentRow, setCurrentRow] = useState(0);
   const [currentGuess, setCurrentGuess] = useState("");
   const [status, setStatus] = useState("loading");
   const [isCheckingGuess, setIsCheckingGuess] = useState(false);
+  const [isRevealingGuess, setIsRevealingGuess] = useState(false);
   const [invalidAttemptCount, setInvalidAttemptCount] = useState(0);
   const [letterStates, setLetterStates] = useState({});
   const [stats, setStats] = useState(DEFAULT_STATS);
@@ -63,7 +75,9 @@ export function useWordleGame() {
   const setupNewAnswer = async () => {
     setStatus("loading");
     setIsCheckingGuess(false);
+    setIsRevealingGuess(false);
     setInvalidAttemptCount(0);
+    setRevealCounts(emptyRevealStates());
 
     try {
       const nextAnswer = await pickRandomAnswer();
@@ -96,7 +110,7 @@ export function useWordleGame() {
   }, [answer, status]);
 
   const acceptGuess = async () => {
-    if (isCheckingGuess || status !== "playing") {
+    if (isCheckingGuess || isRevealingGuess || status !== "playing") {
       return;
     }
 
@@ -123,18 +137,31 @@ export function useWordleGame() {
     }
 
     const evaluation = evaluateGuess(normalizedGuess, answer);
+    const rowIndex = currentRow;
 
     setGuesses((previousGuesses) => {
       const nextGuesses = [...previousGuesses];
-      nextGuesses[currentRow] = normalizedGuess;
+      nextGuesses[rowIndex] = normalizedGuess;
       return nextGuesses;
     });
 
     setEvaluations((previousEvaluations) => {
       const nextEvaluations = [...previousEvaluations];
-      nextEvaluations[currentRow] = evaluation;
+      nextEvaluations[rowIndex] = evaluation;
       return nextEvaluations;
     });
+
+    setIsRevealingGuess(true);
+
+    for (let tileIndex = 1; tileIndex <= WORD_LENGTH; tileIndex += 1) {
+      setRevealCounts((previousCounts) => {
+        const nextCounts = [...previousCounts];
+        nextCounts[rowIndex] = tileIndex;
+        return nextCounts;
+      });
+
+      await sleep(120);
+    }
 
     setLetterStates((previousStates) =>
       mergeLetterStates(previousStates, normalizedGuess, evaluation),
@@ -143,17 +170,19 @@ export function useWordleGame() {
     if (normalizedGuess === answer) {
       setStatus("won");
       setCurrentGuess("");
+      setIsRevealingGuess(false);
       setStats((previousStats) => {
-        const nextStats = recordWin(previousStats, currentRow + 1);
+        const nextStats = recordWin(previousStats, rowIndex + 1);
         saveStats(nextStats);
         return nextStats;
       });
       return;
     }
 
-    if (currentRow === MAX_GUESSES - 1) {
+    if (rowIndex === MAX_GUESSES - 1) {
       setStatus("lost");
       setCurrentGuess("");
+      setIsRevealingGuess(false);
       setStats((previousStats) => {
         const nextStats = recordLoss(previousStats);
         saveStats(nextStats);
@@ -164,10 +193,11 @@ export function useWordleGame() {
 
     setCurrentRow((previousRow) => previousRow + 1);
     setCurrentGuess("");
+    setIsRevealingGuess(false);
   };
 
   const handleKeyInput = (key) => {
-    if (status !== "playing" || isCheckingGuess) {
+    if (status !== "playing" || isCheckingGuess || isRevealingGuess) {
       return;
     }
 
@@ -196,10 +226,12 @@ export function useWordleGame() {
   const startNewGame = () => {
     setGuesses(emptyRows());
     setEvaluations(emptyEvaluations());
+    setRevealCounts(emptyRevealStates());
     setCurrentRow(0);
     setCurrentGuess("");
     setStatus("loading");
     setIsCheckingGuess(false);
+    setIsRevealingGuess(false);
     setInvalidAttemptCount(0);
     setLetterStates({});
     setupNewAnswer();
@@ -215,8 +247,10 @@ export function useWordleGame() {
     handleKeyInput,
     invalidAttemptCount,
     isCheckingGuess,
+    isRevealingGuess,
     letterStates,
     maxGuesses: MAX_GUESSES,
+    revealCounts,
     startNewGame,
     status,
     stats,

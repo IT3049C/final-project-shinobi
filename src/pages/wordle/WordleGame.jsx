@@ -43,8 +43,10 @@ export function WordleGame() {
     handleKeyInput,
     invalidAttemptCount,
     isCheckingGuess,
+    isRevealingGuess,
     letterStates,
     maxGuesses,
+    revealCounts,
     startNewGame,
     status,
     stats,
@@ -82,12 +84,13 @@ export function WordleGame() {
         guesses={guesses}
         invalidAttemptCount={invalidAttemptCount}
         maxGuesses={maxGuesses}
+        revealCounts={revealCounts}
         status={status}
         wordLength={wordLength}
       />
 
       <WordleKeyboard
-        disabled={status !== "playing" || isCheckingGuess}
+        disabled={status !== "playing" || isCheckingGuess || isRevealingGuess}
         letterStates={letterStates}
         onKeyPress={handleKeyInput}
       />

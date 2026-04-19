@@ -21,6 +21,7 @@ export function WordleBoard({
   guesses,
   invalidAttemptCount,
   maxGuesses,
+  revealCounts,
   status,
   wordLength,
 }) {
@@ -30,6 +31,9 @@ export function WordleBoard({
         const submittedGuess = guesses[rowIndex] || "";
         const rowStates = evaluations[rowIndex] || [];
         const isActiveRow = rowIndex === currentRow;
+        const revealedTileCount = revealCounts[rowIndex] || 0;
+        const isRevealingRow =
+          status === "playing" && isActiveRow && submittedGuess.length > 0 && revealedTileCount > 0;
 
         let letters = submittedGuess.split("");
         if (isActiveRow && !submittedGuess) {
@@ -51,9 +55,12 @@ export function WordleBoard({
               const letter = letters[columnIndex] || "";
               const state = rowStates[columnIndex] || null;
               const hasLetter = letter.length > 0;
-              const shouldFlip = Boolean(submittedGuess && state);
+              const shouldRevealTile = isRevealingRow && columnIndex < revealedTileCount;
+              const isFinalizedTile = submittedGuess && state && !isRevealingRow;
+              const shouldFlip = shouldRevealTile || isFinalizedTile;
+              const tileState = shouldRevealTile || isFinalizedTile ? state : null;
 
-              const tileClasses = [getTileClassName(state, hasLetter)];
+              const tileClasses = [getTileClassName(tileState, hasLetter)];
               if (shouldFlip) {
                 tileClasses.push("animate__animated", "animate__flipInX");
               }
@@ -67,10 +74,10 @@ export function WordleBoard({
                   className={tileClasses.join(" ")}
                   key={`tile-${rowIndex}-${columnIndex}`}
                   style={
-                    shouldFlip
+                    shouldRevealTile
                       ? {
                           animationDuration: "0.5s",
-                          animationDelay: `${columnIndex * 0.12}s`,
+                          animationDelay: `${columnIndex * 0.13}s`,
                         }
                       : undefined
                   }
