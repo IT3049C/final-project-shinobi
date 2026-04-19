@@ -1,217 +1,47 @@
 export const WORD_LENGTH = 5;
 export const MAX_GUESSES = 6;
 
-export const ANSWER_WORDS = [
-  "CRANE",
-  "SLATE",
-  "STORE",
-  "SHINE",
-  "PLANT",
-  "TRACK",
-  "BRAVE",
-  "SMART",
-  "CLOUD",
-  "BREAD",
-  "SWEET",
-  "CHARM",
-  "POINT",
-  "WATER",
-  "MONEY",
-  "NERVE",
-  "PULSE",
-  "GRAIN",
-  "ROUND",
-  "LIGHT",
-  "MIGHT",
-  "HEART",
-  "GRACE",
-  "SOUND",
-  "SCALE",
-  "TRAIN",
-  "LEMON",
-  "JUICE",
-  "PRIDE",
-  "FAITH",
-  "FROST",
-  "EARTH",
-  "QUEEN",
-  "KNOCK",
-  "BLINK",
-  "FRAME",
-  "CROWN",
-  "GLASS",
-  "RIVER",
-  "MOUSE",
-  "HOUSE",
-  "ALBUM",
-  "INDEX",
-  "STORM",
-  "GRIND",
-  "SHARP",
-  "TWICE",
-  "UNION",
-  "VALID",
-  "YOUTH",
-];
+function normalizeWord(rawWord) {
+  if (typeof rawWord !== "string") {
+    return "";
+  }
 
-const EXTRA_GUESSES = [
-  "ADORE",
-  "AGILE",
-  "APPLE",
-  "AWARE",
-  "BASIC",
-  "BATCH",
-  "BEACH",
-  "BLACK",
-  "BOARD",
-  "BOOST",
-  "BRAIN",
-  "BRICK",
-  "BROWN",
-  "CABLE",
-  "CANDY",
-  "CHEAP",
-  "CHEER",
-  "CIDER",
-  "CIVIC",
-  "CLEAR",
-  "CLIMB",
-  "CLOSE",
-  "COAST",
-  "CRAFT",
-  "CYCLE",
-  "DAILY",
-  "DANCE",
-  "DREAM",
-  "DRIVE",
-  "ELITE",
-  "ENJOY",
-  "ENTRY",
-  "EXACT",
-  "FAINT",
-  "FANCY",
-  "FIELD",
-  "FINAL",
-  "FLAME",
-  "FLEET",
-  "FLOAT",
-  "FLOUR",
-  "FOCUS",
-  "FORGE",
-  "FRESH",
-  "FRONT",
-  "GIANT",
-  "GHOST",
-  "GLOVE",
-  "GOING",
-  "GRAND",
-  "GREEN",
-  "GROVE",
-  "GUIDE",
-  "HAPPY",
-  "HONEY",
-  "HUMAN",
-  "IDEAL",
-  "IMAGE",
-  "INNER",
-  "JELLY",
-  "KNIFE",
-  "LARGE",
-  "LAYER",
-  "LEARN",
-  "LEVEL",
-  "LOVER",
-  "LUCKY",
-  "METAL",
-  "MODEL",
-  "MOTOR",
-  "MUSIC",
-  "NIGHT",
-  "NOBLE",
-  "NOISE",
-  "OCEAN",
-  "OFFER",
-  "OPERA",
-  "OTHER",
-  "PANEL",
-  "PARTY",
-  "PEACE",
-  "PHONE",
-  "PIECE",
-  "PIVOT",
-  "PLAIN",
-  "PLAZA",
-  "POWER",
-  "PRESS",
-  "PRICE",
-  "PRIZE",
-  "PROUD",
-  "RANCH",
-  "RANGE",
-  "RATIO",
-  "REACT",
-  "READY",
-  "REIGN",
-  "RELAX",
-  "ROUTE",
-  "ROYAL",
-  "RURAL",
-  "SAUCE",
-  "SCENE",
-  "SENSE",
-  "SHARE",
-  "SHEEP",
-  "SHEET",
-  "SHIFT",
-  "SHORT",
-  "SKILL",
-  "SMILE",
-  "SOLID",
-  "SOLVE",
-  "SPACE",
-  "SPARE",
-  "SPARK",
-  "SPEED",
-  "SPEND",
-  "SPICE",
-  "SPLIT",
-  "SPORT",
-  "STAIR",
-  "START",
-  "STEEL",
-  "STILL",
-  "STONE",
-  "STYLE",
-  "SUGAR",
-  "TABLE",
-  "TEACH",
-  "THEME",
-  "THINK",
-  "THROW",
-  "TOAST",
-  "TODAY",
-  "TOKEN",
-  "TOPIC",
-  "TOTAL",
-  "TOUCH",
-  "TRIAL",
-  "TRUCK",
-  "TRUTH",
-  "VALUE",
-  "VIDEO",
-  "VIRAL",
-  "VOICE",
-  "WHOLE",
-  "WORLD",
-  "WORTH",
-  "WRONG",
-];
+  const trimmed = rawWord.trim();
+  if (!new RegExp(`^[A-Za-z]{${WORD_LENGTH}}$`).test(trimmed)) {
+    return "";
+  }
 
-const allWords = [...ANSWER_WORDS, ...EXTRA_GUESSES];
+  return trimmed.toUpperCase();
+}
 
-export const VALID_WORDS = new Set(allWords.map((word) => word.toLowerCase()));
+export async function pickRandomAnswer() {
+  const response = await fetch(
+    `https://random-word-api.herokuapp.com/word?length=${WORD_LENGTH}`,
+  );
 
-export function pickRandomAnswer() {
-  const randomIndex = Math.floor(Math.random() * ANSWER_WORDS.length);
-  return ANSWER_WORDS[randomIndex];
+  if (!response.ok) {
+    throw new Error("Unable to fetch a random word.");
+  }
+
+  const payload = await response.json();
+  const normalized = normalizeWord(payload?.[0]);
+
+  if (!normalized) {
+    throw new Error("Word API returned an invalid word.");
+  }
+
+  return normalized;
+}
+
+export async function isValidGuessWord(guess) {
+  const normalized = normalizeWord(guess);
+  if (!normalized) {
+    return false;
+  }
+
+  const response = await fetch(
+    `https://api.dictionaryapi.dev/api/v2/entries/en/${normalized.toLowerCase()}`,
+  );
+
+  return response.ok;
 }
