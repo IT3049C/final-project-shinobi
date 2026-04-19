@@ -29,16 +29,16 @@
 
 .board-row {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
 .board-row + .board-row {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .square {
-  width: 70px;
-  height: 70px;
+  width: 96px;
+  height: 96px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,7 +46,7 @@
   border: 1px solid rgba(129, 140, 248, 0.25);
   border-radius: 8px;
   font-family: "Orbitron", sans-serif;
-  font-size: 1.8rem;
+  font-size: 2.4rem;
   font-weight: 700;
   cursor: pointer;
   outline: none;
@@ -79,7 +79,7 @@
 }
 
 .game-info {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -125,9 +125,9 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 2.5rem 1rem;
+  padding: 2.5rem 1rem 3.5rem;
   box-sizing: border-box;
   font-family: "Rajdhani", sans-serif;
   color: #e2e8f0;
