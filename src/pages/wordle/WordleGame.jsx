@@ -72,11 +72,6 @@ export function WordleGame() {
 
   return (
     <section className="wordle-page">
-      <header className="wordle-header">
-        <h1>Wordle</h1>
-        <p>Guess the hidden {wordLength}-letter word in {maxGuesses} tries.</p>
-      </header>
-
       <WordleBoard
         currentGuess={currentGuess}
         currentRow={currentRow}
@@ -96,10 +91,16 @@ export function WordleGame() {
       />
 
       <div className="wordle-actions">
-        <button className="wordle-new-game" onClick={startNewGame} type="button">
+        <button
+          className="wordle-new-game"
+          onClick={startNewGame}
+          type="button"
+        >
           New Game
         </button>
-        {status === "loading" ? <p className="wordle-answer">Loading word...</p> : null}
+        {status === "loading" ? (
+          <p className="wordle-answer">Loading word...</p>
+        ) : null}
         {status === "won" || status === "lost" ? (
           <p className="wordle-answer">Answer: {answer}</p>
         ) : null}
@@ -132,12 +133,21 @@ export function WordleGame() {
         <h3>Guess Distribution</h3>
         <div className="wordle-distribution">
           {stats.guessDistribution.map((count, index) => {
-            const percent = Math.max(8, Math.round((count / maxDistribution) * 100));
+            const percent = Math.max(
+              8,
+              Math.round((count / maxDistribution) * 100),
+            );
             return (
-              <div className="wordle-distribution-row" key={`dist-${index + 1}`}>
+              <div
+                className="wordle-distribution-row"
+                key={`dist-${index + 1}`}
+              >
                 <span>{index + 1}</span>
                 <div className="wordle-distribution-bar-wrap">
-                  <div className="wordle-distribution-bar" style={{ width: `${percent}%` }}>
+                  <div
+                    className="wordle-distribution-bar"
+                    style={{ width: `${percent}%` }}
+                  >
                     {count}
                   </div>
                 </div>

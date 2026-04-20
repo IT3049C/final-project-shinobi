@@ -1,30 +1,46 @@
 import React from "react";
 
-export function TriviaSummary({ gameState, onNextQuestion, onRestart, questionCount }) {
+export function TriviaSummary({
+  gameState,
+  onNextQuestion,
+  onRestart,
+  questionCount,
+}) {
   const isLastQuestion = gameState.currentIndex >= questionCount - 1;
-  const summaryLabel = gameState.finished ? "Trivia complete" : gameState.selectedAnswer ? "Answer locked in" : "Awaiting answer";
+  const summaryLabel = gameState.finished
+    ? "Trivia complete"
+    : gameState.selectedAnswer
+      ? "Answer locked in"
+      : "Awaiting answer";
 
   return (
     <section className="trivia-card trivia-summary-card">
-      <p className="trivia-summary-label">{summaryLabel}</p>
-      <div className="trivia-summary-stats">
-        <div>
-          <span className="trivia-summary-value">{gameState.score}</span>
-          <span className="trivia-summary-text">Score</span>
+      <div className="trivia-score-stack">
+        <div className="trivia-score-box">
+          <span className="trivia-score-value">
+            {Math.min(gameState.currentIndex + 1, questionCount)} /{" "}
+            {questionCount}
+          </span>
+          <span className="trivia-score-label">Question</span>
         </div>
-        <div>
-          <span className="trivia-summary-value">{gameState.correctCount}</span>
-          <span className="trivia-summary-text">Correct</span>
-        </div>
-        <div>
-          <span className="trivia-summary-value">{gameState.currentIndex + 1}</span>
-          <span className="trivia-summary-text">Question</span>
+
+        <div className="trivia-score-box">
+          <span className="trivia-score-value">
+            {gameState.correctCount} / {questionCount}
+          </span>
+          <span className="trivia-score-label">Score</span>
         </div>
       </div>
 
+      <p className="trivia-summary-label">{summaryLabel}</p>
+
       <div className="trivia-summary-actions">
         {gameState.finished ? (
-          <button className="trivia-secondary-button" onClick={onRestart} type="button">
+          <button
+            className="trivia-secondary-button"
+            onClick={onRestart}
+            type="button"
+          >
             Play Again
           </button>
         ) : (

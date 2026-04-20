@@ -1,0 +1,88 @@
+.game-page-wrapper {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem;
+  box-sizing: border-box;
+}
+
+.game-page-wrapper-wide {
+  max-width: 1120px;
+}
+
+.game-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(129, 140, 248, 0.2);
+}
+
+.game-page-header.wordle-accent {
+  border-bottom-color: rgba(251, 191, 36, 0.2);
+}
+
+.game-page-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.game-page-title {
+  margin: 0;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.4));
+}
+
+.game-page-title.wordle-accent {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.4));
+}
+
+.game-page-welcome {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+}
+
+.game-page-welcome-name {
+  color: #818cf8;
+  font-weight: 700;
+}
+
+.game-page-welcome-name.wordle-accent {
+  color: #fbbf24;
+}
+
+.game-page-back-link {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #475569;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.game-page-back-link:hover {
+  color: #818cf8;
+}
+
+.game-page-back-link.wordle-accent:hover {
+  color: #fbbf24;
+}

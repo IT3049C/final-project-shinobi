@@ -25,17 +25,6 @@ export function TriviaGame() {
 
   return (
     <section className="trivia-page">
-      <header className="trivia-header">
-        <div>
-          <p className="trivia-eyebrow">Trivia Arena</p>
-          <h1>Category and difficulty quiz</h1>
-          <p className="trivia-subtitle">
-            Choose a topic, pick a difficulty, and answer a ten-question round from Open Trivia DB.
-          </p>
-        </div>
-        <div className="trivia-progress-pill">{progressLabel}</div>
-      </header>
-
       <TriviaControls
         categories={categories}
         onStartGame={startGame}
@@ -44,11 +33,19 @@ export function TriviaGame() {
         status={status}
       />
 
-      {error ? <div className="trivia-banner trivia-banner-error">{error}</div> : null}
-      {feedback ? <div className="trivia-banner trivia-banner-feedback">{feedback}</div> : null}
+      {error ? (
+        <div className="trivia-banner trivia-banner-error">{error}</div>
+      ) : null}
+      {feedback ? (
+        <div className="trivia-banner trivia-banner-feedback">{feedback}</div>
+      ) : null}
 
       <div className="trivia-layout">
-        <TriviaQuestion currentQuestion={currentQuestion} gameState={gameState} onAnswer={submitAnswer} />
+        <TriviaQuestion
+          currentQuestion={currentQuestion}
+          gameState={gameState}
+          onAnswer={submitAnswer}
+        />
 
         <TriviaSummary
           gameState={gameState}
