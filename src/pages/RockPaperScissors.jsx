@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export function RPSGamePage() {
   const settings = JSON.parse(localStorage.getItem("rpsSettings")) || {};
   const navigate = useNavigate();
-  const playerName = settings?.name || "Player";
+  const playerName = localStorage.getItem("playerName") || "Player";
   const playerAvatar = settings?.avatar || "assassin";
   const difficulty = settings?.difficulty || "normal";
 

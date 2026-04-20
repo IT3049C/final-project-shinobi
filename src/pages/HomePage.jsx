@@ -3,25 +3,22 @@ import { useState } from "react";
 import { games } from "../data/gamesData";
 import "../styles/HomePage.css";
 
+const LEFT_WIDTH = 260;
+
 export function HomePage() {
   const [inputName, setInputName] = useState("");
-  const [playerName, setPlayerName] = useState("");
-  const [hoveredGame, setHoveredGame] = useState(games[0]);
+  const [playerName, setPlayerName] = useState(
+    () => localStorage.getItem("playerName") || "",
+  );
 
   const handleEnter = () => {
     if (inputName.trim()) {
       setPlayerName(inputName.trim());
-      localStorage.setItem("playerName", inputName.trim()); // ← add this
+      localStorage.setItem("playerName", inputName.trim());
     }
   };
 
-  const renderPreview = () => {
-    if (!hoveredGame) return null;
-    if (typeof hoveredGame.preview === "function") {
-      return hoveredGame.preview(true); // isActive is always true when this game is hovered
-    }
-    return hoveredGame.preview;
-  };
+  const hasName = playerName.trim().length > 0;
 
   return (
     <section className="home-section">
@@ -55,43 +52,63 @@ export function HomePage() {
           <ul className="game-list-ul">
             {games.map((game) => (
               <li key={game.key}>
-                <Link
-                  to={game.path}
-                  className={`game-list-item${hoveredGame?.key === game.key ? " hovered" : ""}`}
-                  onMouseEnter={() => setHoveredGame(game)}
-                >
-                  <span style={{ fontSize: "1.4rem", flexShrink: 0 }}>
-                    {game.emoji}
-                  </span>
-                  <div>
-                    <p
-                      className="game-item-name"
+                {hasName ? (
+                  <Link to={game.path} className="game-list-item">
+                    <span style={{ fontSize: "1.4rem", flexShrink: 0 }}>
+                      {game.emoji}
+                    </span>
+                    <div>
+                      <p
+                        className="game-item-name"
+                        style={{ color: game.color }}
+                      >
+                        {game.name}
+                      </p>
+                      <p className="game-item-desc">{game.description}</p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="game-list-item game-list-item-disabled">
+                    <span
                       style={{
-                        color:
-                          hoveredGame?.key === game.key
-                            ? game.color
-                            : "#cbd5e1",
+                        fontSize: "1.4rem",
+                        flexShrink: 0,
+                        opacity: 0.3,
                       }}
                     >
-                      {game.name}
-                    </p>
-                    <p className="game-item-desc">{game.description}</p>
+                      {game.emoji}
+                    </span>
+                    <div>
+                      <p
+                        className="game-item-name"
+                        style={{ color: "#334155" }}
+                      >
+                        {game.name}
+                      </p>
+                      <p className="game-item-desc">{game.description}</p>
+                    </div>
                   </div>
-                </Link>
+                )}
               </li>
             ))}
           </ul>
+          {!hasName && (
+            <p className="game-list-locked">Enter your name to unlock games</p>
+          )}
         </div>
 
         <div
           className="game-preview-panel"
           style={{
-            background: `radial-gradient(ellipse at center, ${hoveredGame?.color}18 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse at center, ${games[0]?.color}18 0%, transparent 70%)`,
           }}
         >
-          {renderPreview()}
+          {typeof games[0]?.preview === "function"
+            ? games[0].preview(false)
+            : games[0]?.preview}
         </div>
       </div>
+
       <div className="game-frame-credits">
         <span className="credit-item">Apiwat Anachai</span>
         <span className="credit-divider">×</span>
