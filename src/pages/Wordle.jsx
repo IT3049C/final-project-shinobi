@@ -4,7 +4,7 @@ import "../styles/PokemonGame.css";
 
 export function Wordle() {
   const navigate = useNavigate();
-  const playerName = localStorage.getItem("playerName") || null;
+  const playerName = sessionStorage.getItem("playerName") || "Player";
 
   return (
     <div className="pg-wrapper">

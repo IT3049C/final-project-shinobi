@@ -4,7 +4,7 @@ import "../styles/PokemonGame.css";
 
 export function Trivia() {
   const navigate = useNavigate();
-  const playerName = localStorage.getItem("playerName") || "Player";
+  const playerName = sessionStorage.getItem("playerName") || "Player";
 
   return (
     <div className="pg-wrapper">

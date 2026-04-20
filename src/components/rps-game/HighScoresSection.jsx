@@ -1,41 +1,19 @@
-import { useState } from "react";
-
-export function HighScoresSection() {
-  const [scores, setScores] = useState(() => {
-    return JSON.parse(localStorage.getItem("rpsHighScores")) || [];
-  });
-
-  const handleClear = () => {
-    localStorage.removeItem("rpsHighScores");
-    setScores([]);
-  };
-
+export function HighScoresSection({ highScore, onClear }) {
   return (
     <section aria-labelledby="highscores-heading" className="card">
-      <h2 id="highscores-heading">High Scores</h2>
-      <ul id="highscores">
-        {scores.length === 0 ? (
-          <li
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              color: "#475569",
-              fontSize: "0.85rem",
-              letterSpacing: "0.05em",
-              padding: "0.4rem 0",
-            }}
-          >
-            No high scores yet.
-          </li>
+      <h2 id="highscores-heading">High Score</h2>
+      <div className="highscore-display">
+        {highScore ? (
+          <div className="highscore-row">
+            <span className="highscore-name">{highScore.name}</span>
+            <span className="highscore-value">{highScore.score}</span>
+          </div>
         ) : (
-          scores.map((s, i) => (
-            <li key={i}>
-              {s.name}: {s.score}
-            </li>
-          ))
+          <div className="highscore-empty">No high score yet.</div>
         )}
-      </ul>
-      <button id="clear-highscores" type="button" onClick={handleClear}>
-        Clear High Scores
+      </div>
+      <button id="clear-highscores" type="button" onClick={onClear}>
+        Clear High Score
       </button>
     </section>
   );

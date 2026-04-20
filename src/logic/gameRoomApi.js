@@ -63,5 +63,5 @@ export function getPlayerId() {
 }
 
 export function getPlayerName() {
-  return localStorage.getItem("playerName") || "Player";
+  return sessionStorage.getItem("playerName") || "Player";
 }
