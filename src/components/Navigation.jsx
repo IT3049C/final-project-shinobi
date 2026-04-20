@@ -1,16 +1,32 @@
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "./Navigation.css";
 
 export function Navigation() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [hasName, setHasName] = useState(() =>
+    Boolean(sessionStorage.getItem("playerName")),
+  );
 
-  const navItems = [
+  // Re-check on navigation & storage changes
+  useEffect(() => {
+    const check = () =>
+      setHasName(Boolean(sessionStorage.getItem("playerName")));
+    window.addEventListener("storage", check);
+    window.addEventListener("focus", check);
+    const interval = setInterval(check, 500);
+    return () => {
+      window.removeEventListener("storage", check);
+      window.removeEventListener("focus", check);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const links = [
     { to: "/", label: "Home" },
-    { to: "/trivia", label: "Trivia" },
     { to: "/rps", label: "Rock Paper Scissors" },
-    { to: "/tic-tac-toe", label: "Tic Tac Toe" },
     { to: "/wordle", label: "Wordle" },
+    { to: "/tic-tac-toe", label: "Tic Tac Toe" },
+    { to: "/trivia", label: "Trivia" },
     { to: "/another-game", label: "Pokemon" },
   ];
 
@@ -22,24 +38,27 @@ export function Navigation() {
         </NavLink>
       </div>
       <ul className="navbar-links">
-        {navItems.map((item) => {
-          const isActive =
-            item.to === "/"
-              ? location.pathname === "/"
-              : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
-
-          return (
-            <li key={item.to}>
-              <button
-                className={isActive ? "nav-link active nav-button" : "nav-link nav-button"}
-                onClick={() => navigate(item.to)}
-                type="button"
+        {links.map((link) => (
+          <li key={link.to}>
+            {hasName || link.to === "/" ? (
+              <NavLink
+                to={link.to}
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
               >
-                {item.label}
-              </button>
-            </li>
-          );
-        })}
+                {link.label}
+              </NavLink>
+            ) : (
+              <span
+                className="nav-link nav-link-disabled"
+                title="Enter your name on Home to unlock"
+              >
+                {link.label}
+              </span>
+            )}
+          </li>
+        ))}
       </ul>
     </nav>
   );

@@ -46,7 +46,10 @@ function mergeLetterStates(previousStates, guess, evaluation) {
     const nextState = evaluation[i];
     const currentState = nextStates[letter];
 
-    if (!currentState || LETTER_PRIORITY[nextState] > LETTER_PRIORITY[currentState]) {
+    if (
+      !currentState ||
+      LETTER_PRIORITY[nextState] > LETTER_PRIORITY[currentState]
+    ) {
       nextStates[letter] = nextState;
     }
   }
@@ -74,6 +77,7 @@ export function useWordleGame() {
 
   const setupNewAnswer = async () => {
     setStatus("loading");
+    console.log("🎯 Wordle answer:", answer);
     setIsCheckingGuess(false);
     setIsRevealingGuess(false);
     setInvalidAttemptCount(0);
@@ -236,7 +240,7 @@ export function useWordleGame() {
     setLetterStates({});
     setupNewAnswer();
   };
-
+  // console.log("🎯 Wordle answer:", answer);
   return {
     answer,
     currentGuess,

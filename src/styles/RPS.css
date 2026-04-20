@@ -458,3 +458,44 @@ header .nav-link:hover {
   color: #94a3b8;
   background: rgba(148, 163, 184, 0.08);
 }
+
+/* ── High Score ── */
+.highscore-display {
+  padding: 0.5rem 0;
+}
+
+.highscore-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  background: rgba(129, 140, 248, 0.05);
+  animation: popIn 0.3s ease forwards;
+}
+
+.highscore-name {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+}
+
+.highscore-value {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #818cf8;
+  text-shadow: 0 0 16px rgba(129, 140, 248, 0.6);
+}
+
+.highscore-empty {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0;
+}

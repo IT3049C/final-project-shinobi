@@ -1,23 +1,40 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { games } from "../data/gamesData";
+import { avatars } from "../data/avatars";
 import "../styles/HomePage.css";
 
 const LEFT_WIDTH = 260;
 
 export function HomePage() {
+  const [hoveredGame, setHoveredGame] = useState(null);
   const [inputName, setInputName] = useState("");
   const [playerName, setPlayerName] = useState(
-    () => localStorage.getItem("playerName") || "",
+    () => sessionStorage.getItem("playerName") || "",
   );
+  const [selectedAvatar, setSelectedAvatar] = useState(
+    () => sessionStorage.getItem("playerAvatar") || "assassin",
+  );
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
 
+  const activeGame = games.find((g) => g?.key === hoveredGame) ?? games[0];
   const handleEnter = () => {
     if (inputName.trim()) {
-      setPlayerName(inputName.trim());
-      localStorage.setItem("playerName", inputName.trim());
+      const trimmed = inputName.trim();
+      setPlayerName(trimmed);
+      sessionStorage.setItem("playerName", trimmed);
+      sessionStorage.setItem("playerAvatar", selectedAvatar);
     }
   };
 
+  const handleAvatarPick = (key) => {
+    setSelectedAvatar(key);
+    setAvatarPickerOpen(false);
+    sessionStorage.setItem("playerAvatar", key);
+  };
+
+  const currentAvatar =
+    avatars.find((a) => a.key === selectedAvatar) ?? avatars[0];
   const hasName = playerName.trim().length > 0;
 
   return (
@@ -25,6 +42,34 @@ export function HomePage() {
       <div className="home-name-section">
         <h2 className="home-name-title">Enter Your Name</h2>
         <div className="home-name-row">
+          <div className="avatar-picker-wrap">
+            <button
+              className="avatar-picker-btn"
+              onClick={() => setAvatarPickerOpen((v) => !v)}
+              type="button"
+            >
+              <img
+                src={currentAvatar.image}
+                alt={currentAvatar.key}
+                className="avatar-img"
+              />
+            </button>
+            {avatarPickerOpen && (
+              <div className="avatar-picker-dropdown">
+                {avatars.map((a) => (
+                  <button
+                    key={a.key}
+                    className={`avatar-picker-option ${a.key === selectedAvatar ? "selected" : ""}`}
+                    onClick={() => handleAvatarPick(a.key)}
+                    type="button"
+                  >
+                    <img src={a.image} alt={a.key} className="avatar-img" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <input
             className="home-name-input"
             type="text"
@@ -51,7 +96,11 @@ export function HomePage() {
           <p className="game-list-label">Select Game</p>
           <ul className="game-list-ul">
             {games.map((game) => (
-              <li key={game.key}>
+              <li
+                key={game.key}
+                onMouseEnter={() => setHoveredGame(game.key)}
+                onMouseLeave={() => setHoveredGame(null)}
+              >
                 {hasName ? (
                   <Link to={game.path} className="game-list-item">
                     <span style={{ fontSize: "1.4rem", flexShrink: 0 }}>
@@ -100,12 +149,12 @@ export function HomePage() {
         <div
           className="game-preview-panel"
           style={{
-            background: `radial-gradient(ellipse at center, ${games[0]?.color}18 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse at center, ${activeGame?.color}18 0%, transparent 70%)`,
           }}
         >
-          {typeof games[0]?.preview === "function"
-            ? games[0].preview(false)
-            : games[0]?.preview}
+          {typeof activeGame?.preview === "function"
+            ? activeGame.preview(hoveredGame === activeGame?.key)
+            : activeGame?.preview}
         </div>
       </div>
 
