@@ -13,7 +13,7 @@ import { createGameState, fetchRandomPokemon } from "../logic/pokemonGame";
 import { getPlayerId } from "../logic/gameRoomApi";
 import "../styles/PokemonGame.css";
 
-export default function AnotherGame() {
+export default function Pokemon() {
   const navigate = useNavigate();
   const playerId = getPlayerId();
 
@@ -61,7 +61,7 @@ export default function AnotherGame() {
     setGuess,
   });
 
-  const handleJoinRoom = (rId, gameState, playerIndex) => {
+  const handleJoinRoom = (rId, gameState) => {
     setRoomId(rId);
     setGame(gameState);
     if (gameState.pokemon) setPokemon(gameState.pokemon);

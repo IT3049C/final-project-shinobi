@@ -252,10 +252,9 @@ export const games = [
       </div>
     ),
   },
-  ,
   {
-    key: "another-game",
-    path: "/another-game",
+    key: "pokemon",
+    path: "/pokemon",
     name: "Pokemon",
     description: "Reveal the image. Guess what's hiding.",
     emoji: "🖼️",

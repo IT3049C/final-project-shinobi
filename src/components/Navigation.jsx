@@ -27,7 +27,7 @@ export function Navigation() {
     { to: "/wordle", label: "Wordle" },
     { to: "/tic-tac-toe", label: "Tic Tac Toe" },
     { to: "/trivia", label: "Trivia" },
-    { to: "/another-game", label: "Pokemon" },
+    { to: "/pokemon", label: "Pokemon" },
   ];
 
   return (

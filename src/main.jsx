@@ -8,7 +8,7 @@ import { RPSGamePage } from "./pages/RockPaperScissors";
 import { TicTacToe } from "./pages/TicTacToe";
 import { Trivia } from "./pages/Trivia";
 import { Wordle } from "./pages/Wordle";
-import AnotherGame from "./pages/AnotherGame";
+import Pokemon from "./pages/Pokemon";
 
 const router = createBrowserRouter(
   [
@@ -21,7 +21,7 @@ const router = createBrowserRouter(
         { path: "/tic-tac-toe", element: <TicTacToe /> },
         { path: "/trivia", element: <Trivia /> },
         { path: "/wordle", element: <Wordle /> },
-        { path: "/another-game", element: <AnotherGame /> },
+        { path: "/pokemon", element: <Pokemon /> },
       ],
     },
   ],
