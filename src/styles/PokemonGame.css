@@ -61,6 +61,27 @@
   filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.4));
 }
 
+.room-back-button {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.room-back-button:hover {
+  color: #818cf8;
+}
+
 /* ── Score Bar ── */
 .pg-scorebar {
   display: flex;
