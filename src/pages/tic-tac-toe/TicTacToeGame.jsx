@@ -133,7 +133,6 @@ export function TicTacToeGame() {
     return (
       <div className="ttt-page">
         <GameRoomHeader title="Tic Tac Toe" onBackToLobby={() => navigate("/")} />
-        <RoomPlayerBadge name={playerName} />
         <TicTacToeLobby onJoinRoom={handleJoinRoom} onLocalPlay={handleLocalPlay} />
       </div>
     );
