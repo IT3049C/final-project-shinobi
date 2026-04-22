@@ -29,6 +29,7 @@ export function TicTacToeLobby({ onJoinRoom, onLocalPlay }) {
         const data = await listRooms();
         const open = data.filter(
           (room) =>
+            room.gameState?.gameType === "tictactoe" &&
             room.gameState?.phase === "waiting" &&
             (room.gameState?.players?.length ?? 0) <
               (room.gameState?.maxPlayers ?? 2),
@@ -155,7 +156,11 @@ export function TicTacToeLobby({ onJoinRoom, onLocalPlay }) {
 
           <div className="lobby-divider">or</div>
 
-          <button className="pg-btn pg-btn-reveal" onClick={onLocalPlay} type="button">
+          <button
+            className="pg-btn pg-btn-reveal"
+            onClick={onLocalPlay}
+            type="button"
+          >
             🎮 Play Local 2 Player
           </button>
         </div>

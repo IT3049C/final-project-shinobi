@@ -1,10 +1,11 @@
 export function createTicTacToeRoomState(players, config = {}) {
   const maxPlayers = config.maxPlayers ?? 2;
   return {
+    gameType: "tictactoe",
     players: players.map((player, index) => ({
       id: typeof player === "string" ? `${index}` : player.id,
       name: typeof player === "string" ? player : player.name,
-      score: typeof player === "string" ? 0 : player.score ?? 0,
+      score: typeof player === "string" ? 0 : (player.score ?? 0),
       eliminated: false,
       left: false,
       mark: index === 0 ? "X" : "O",
@@ -57,7 +58,9 @@ export function getWinnerPlayer(gameState) {
     return null;
   }
 
-  return gameState.players.find((player) => player.id === gameState.winnerId) ?? null;
+  return (
+    gameState.players.find((player) => player.id === gameState.winnerId) ?? null
+  );
 }
 
 export function playTicTacToeMove(gameState, tileIndex, playerId) {
@@ -128,7 +131,8 @@ export function playTicTacToeMove(gameState, tileIndex, playerId) {
     winnerId: null,
     winningLine: [],
     lastMove: { tileIndex, mark: currentPlayer.mark },
-    currentPlayerIndex: (gameState.currentPlayerIndex + 1) % gameState.players.length,
+    currentPlayerIndex:
+      (gameState.currentPlayerIndex + 1) % gameState.players.length,
   };
 }
 

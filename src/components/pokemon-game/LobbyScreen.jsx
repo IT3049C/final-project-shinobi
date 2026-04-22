@@ -34,6 +34,7 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
         const data = await listRooms();
         const open = data.filter(
           (r) =>
+            r.gameState?.gameType === "pokemon" &&
             r.gameState?.phase === "waiting" &&
             (r.gameState?.players?.length ?? 0) <
               (r.gameState?.maxPlayers ?? 2),
@@ -57,6 +58,7 @@ export function LobbyScreen({ onJoinRoom, onLocalPlay }) {
     try {
       const pokemon = await fetchRandomPokemon();
       const initialState = {
+        gameType: "pokemon",
         roomName: roomName.trim(),
         players: [
           {
