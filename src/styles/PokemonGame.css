@@ -1,0 +1,941 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&display=swap");
+
+@keyframes tileReveal {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Wrapper ── */
+.pg-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem;
+  box-sizing: border-box;
+  font-family: "Rajdhani", sans-serif;
+  color: #e2e8f0;
+  gap: 1.5rem;
+}
+
+/* ── Header ── */
+.pg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid rgba(129, 140, 248, 0.2);
+  padding-bottom: 1rem;
+}
+
+.pg-heading {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin: 0;
+  background: linear-gradient(135deg, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.4));
+}
+
+.room-back-button {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.room-back-button:hover {
+  color: #818cf8;
+}
+
+/* ── Score Bar ── */
+.pg-scorebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  box-sizing: border-box;
+}
+
+.pg-round {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.pg-scores {
+  display: flex;
+  gap: 1rem;
+}
+
+.pg-score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(129, 140, 248, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.pg-score-active {
+  border-color: rgba(129, 140, 248, 0.5);
+  background: rgba(129, 140, 248, 0.08);
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.15);
+}
+
+.pg-score-name {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.pg-score-value {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #818cf8;
+  text-shadow: 0 0 12px rgba(129, 140, 248, 0.4);
+}
+
+/* ── Board ── */
+.pg-board {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ── Pokemon Image + Tiles ── */
+.pg-image-wrapper {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  flex-shrink: 0;
+}
+
+.pg-pokemon-img {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  draggable: false;
+}
+
+.pg-loading {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.8rem;
+  color: #475569;
+  letter-spacing: 0.15em;
+}
+
+.pg-tile-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0; /* ← was 3px */
+}
+
+.pg-tile {
+  background: #0a0a0f; /* ← solid, matches app bg */
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  transition:
+    background 0.3s ease,
+    border-color 0.2s ease;
+}
+
+.pg-tile-clickable {
+  cursor: pointer;
+}
+
+.pg-tile-clickable:hover {
+  background: #1a1a2e; /* ← solid dark color, nothing bleeds through */
+  outline: 1px solid rgba(129, 140, 248, 0.5);
+  cursor: pointer;
+}
+
+.pg-tile-revealed {
+  background: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none;
+}
+
+/* ── Action Panel ── */
+.pg-action-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 220px;
+}
+
+.pg-turn-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(129, 140, 248, 0.04);
+}
+
+.pg-turn-label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.pg-turn-name {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #818cf8;
+  text-shadow: 0 0 12px rgba(129, 140, 248, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.pg-eliminated {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.8rem;
+  color: #f472b6;
+  letter-spacing: 0.05em;
+}
+
+.pg-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pg-btn {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0;
+  border: 1px solid;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s,
+    box-shadow 0.2s;
+}
+
+.pg-btn:hover {
+  transform: translateY(-1px);
+}
+
+.pg-btn-reveal {
+  background: rgba(129, 140, 248, 0.08);
+  border-color: rgba(129, 140, 248, 0.3);
+  color: #818cf8;
+}
+
+.pg-btn-reveal:hover {
+  background: rgba(129, 140, 248, 0.16);
+  border-color: rgba(129, 140, 248, 0.6);
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.2);
+}
+
+.pg-btn-guess {
+  background: rgba(192, 132, 252, 0.08);
+  border-color: rgba(192, 132, 252, 0.3);
+  color: #c084fc;
+}
+
+.pg-btn-guess:hover {
+  background: rgba(192, 132, 252, 0.16);
+  border-color: rgba(192, 132, 252, 0.6);
+  box-shadow: 0 0 16px rgba(192, 132, 252, 0.2);
+}
+
+.pg-btn-cancel {
+  background: none;
+  border: none;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #475569;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.pg-btn-cancel:hover {
+  color: #94a3b8;
+}
+
+.pg-action-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.pg-prompt-text {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #818cf8;
+  margin: 0;
+}
+
+.pg-guess-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.pg-guess-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  color: #e2e8f0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.65rem 1rem;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pg-guess-input:focus {
+  border-color: rgba(192, 132, 252, 0.6);
+  box-shadow: 0 0 16px rgba(192, 132, 252, 0.15);
+}
+
+.pg-guess-input::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+}
+
+.pg-guess-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pg-wrong-guess {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f472b6;
+  letter-spacing: 0.05em;
+  margin: 0;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ── Round Result ── */
+.pg-round-result {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  animation: fadeIn 0.4s ease;
+}
+
+.pg-result-winner {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #818cf8;
+  text-shadow: 0 0 16px rgba(129, 140, 248, 0.5);
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.pg-result-pokemon {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.pg-result-pokemon span {
+  color: #c084fc;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+/* ── Game Over ── */
+.pg-game-over {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pg-game-over-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.pg-game-over-btns {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Setup Screen ── */
+.pg-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  box-sizing: border-box;
+}
+
+.pg-setup-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.pg-setup-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.pg-setup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pg-setup-label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.pg-setup-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #e2e8f0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.65rem 1rem;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pg-setup-input:focus {
+  border-color: rgba(129, 140, 248, 0.7);
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.2);
+}
+
+.pg-setup-input::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+}
+
+/* ── Lobby ── */
+.lobby-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.lobby-player-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lobby-player-label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.lobby-player-name {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #818cf8;
+  text-shadow: 0 0 12px rgba(129, 140, 248, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.lobby-columns {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.lobby-card {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  box-sizing: border-box;
+}
+
+.lobby-card-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #475569;
+  margin: 0;
+}
+
+.lobby-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lobby-label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.lobby-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #e2e8f0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.65rem 1rem;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lobby-input:focus {
+  border-color: rgba(129, 140, 248, 0.7);
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.2);
+}
+
+.lobby-input::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+}
+
+.lobby-code-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lobby-code-row .lobby-input {
+  flex: 1;
+}
+
+.lobby-divider {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-transform: uppercase;
+  text-align: center;
+  position: relative;
+}
+
+.lobby-divider::before,
+.lobby-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background: rgba(129, 140, 248, 0.15);
+}
+
+.lobby-divider::before {
+  left: 0;
+}
+.lobby-divider::after {
+  right: 0;
+}
+
+.lobby-room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(129, 140, 248, 0.3) transparent;
+}
+
+.lobby-room-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(129, 140, 248, 0.15);
+  background: rgba(255, 255, 255, 0.02);
+  gap: 1rem;
+}
+
+.lobby-room-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.lobby-room-name {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  letter-spacing: 0.05em;
+}
+
+.lobby-room-meta {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.75rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+}
+
+.lobby-room-code {
+  color: #818cf8;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.7rem;
+}
+
+.lobby-empty {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.lobby-error {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  color: #f472b6;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* ── Waiting Room ── */
+.waiting-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+.waiting-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.waiting-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.waiting-label {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: #475569;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.waiting-code {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: #818cf8;
+  text-shadow: 0 0 20px rgba(129, 140, 248, 0.5);
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  background: rgba(129, 140, 248, 0.06);
+}
+
+.waiting-hint {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  color: #475569;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.waiting-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.waiting-dots span {
+  width: 8px;
+  height: 8px;
+  background: rgba(129, 140, 248, 0.5);
+  border-radius: 50%;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.waiting-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.waiting-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Online badges ── */
+.pg-room-badge {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-transform: uppercase;
+  align-self: flex-end;
+}
+
+.pg-room-badge span {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.8rem;
+  color: #818cf8;
+  margin-left: 0.35rem;
+}
+
+.pg-waiting-turn {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.05em;
+  margin: 0;
+  font-style: italic;
+}
+
+.lobby-option-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.lobby-option-btn {
+  flex: 1;
+  min-width: 55px;
+  padding: 0.5rem 0.25rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  color: #94a3b8;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+.lobby-option-btn:hover {
+  border-color: rgba(129, 140, 248, 0.4);
+  color: #cbd5e1;
+}
+
+.lobby-option-btn.active {
+  background: rgba(129, 140, 248, 0.15);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #818cf8;
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.2);
+}
+
+.waiting-players {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+
+.waiting-player-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.waiting-player-item.empty {
+  color: #475569;
+  font-style: italic;
+  border-style: dashed;
+}
+
+.waiting-ready {
+  color: #818cf8;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pg-score-left {
+  border-color: rgba(244, 114, 182, 0.4);
+  background: rgba(244, 114, 182, 0.06);
+}
+
+.pg-score-left .pg-score-name {
+  color: #f472b6;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.pg-score-left .pg-score-value {
+  color: #f472b6;
+  text-shadow: 0 0 12px rgba(244, 114, 182, 0.3);
+  opacity: 0.7;
+}
