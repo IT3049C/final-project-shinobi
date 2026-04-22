@@ -149,7 +149,7 @@ export default function Pokemon() {
       <div className="pg-board">
         <TileBoard
           pokemon={pokemon}
-          tiles={game.tiles}
+          tiles={isRoundOver ? Array(game.tileCount).fill(true) : game.tiles}
           tileCount={game.tileCount}
           isRoundOver={isRoundOver}
           actionMode={actionMode}

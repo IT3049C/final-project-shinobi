@@ -36,7 +36,7 @@ export function TileBoard({
                 key={i}
                 className={[
                   "pg-tile",
-                  revealed && !isRoundOver ? "pg-tile-revealed" : "",
+                  revealed ? "pg-tile-revealed" : "",
                   !revealed && actionMode === "reveal" && isMyTurn
                     ? "pg-tile-clickable"
                     : "",
